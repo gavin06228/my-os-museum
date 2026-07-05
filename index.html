@@ -2,40 +2,58 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMware Workstation Pro - 終極全宇宙系統博物館</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VMware Workstation Pro - 40系統神級博物館 v1.2</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
         body { display: flex; flex-direction: column; height: 100vh; background-color: #1e1e1e; color: #d4d4d4; overflow: hidden; }
+        
+        /* 頂部選單列 */
         .menu-bar { background-color: #2d2d2d; height: 30px; display: flex; align-items: center; padding: 0 10px; font-size: 12px; border-bottom: 1px solid #3c3c3c; gap: 15px; }
-        .menu-item { cursor: pointer; padding: 2px 5px; }
+        .menu-item { cursor: pointer; padding: 2px 5px; color: #aaa; }
         .menu-item:hover { background-color: #3e3e3e; color: #fff; border-radius: 3px; }
-        .toolbar { background-color: #252526; height: 45px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #3c3c3c; gap: 10px; }
-        .btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background-color: #333333; border: 1px solid #444444; border-radius: 4px; color: #ccc; font-size: 12px; cursor: pointer; }
-        .btn:hover { background-color: #444444; color: #fff; }
+        
+        /* 工具列 */
+        .toolbar { background-color: #252526; height: 50px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #3c3c3c; gap: 12px; }
+        .btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #333333; border: 1px solid #444444; border-radius: 4px; color: #ccc; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn:hover { background-color: #444444; color: #fff; border-color: #555; }
         .btn-play .icon { width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid #4caf50; }
         .btn-stop .icon { width: 10px; height: 10px; background-color: #f44336; }
+        
+        /* 主架構 */
         .main-container { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 310px; background-color: #252526; border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; overflow-y: auto; }
-        .sidebar-header { padding: 10px 15px; font-size: 11px; font-weight: bold; color: #858585; text-transform: uppercase; border-bottom: 1px solid #2d2d2d; background-color: #252526; position: sticky; top: 0; z-index: 10; }
+        
+        /* 側邊欄優化 */
+        .sidebar { width: 320px; background-color: #252526; border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-header { padding: 12px 15px; font-size: 11px; font-weight: bold; color: #007acc; text-transform: uppercase; border-bottom: 1px solid #2d2d2d; background-color: #202021; position: sticky; top: 0; z-index: 10; letter-spacing: 1px; }
         .vm-list { list-style: none; padding: 5px 0; }
-        .vm-item { display: flex; align-items: center; padding: 8px 15px; font-size: 13px; cursor: pointer; gap: 10px; color: #cccccc; }
+        .vm-item { display: flex; align-items: center; padding: 10px 15px; font-size: 13px; cursor: pointer; gap: 12px; color: #cccccc; border-left: 3px solid transparent; }
         .vm-item:hover { background-color: #2a2d2e; color: #fff; }
-        .vm-item.active { background-color: #094771; color: #ffffff; }
-        .vm-status-dot { width: 8px; height: 8px; background-color: #555; border-radius: 50%; flex-shrink: 0; }
-        .vm-item.running .vm-status-dot { background-color: #4caf50; box-shadow: 0 0 6px #4caf50; }
+        .vm-item.active { background-color: #094771; color: #ffffff; border-left-color: #007acc; }
+        .vm-status-dot { width: 8px; height: 8px; background-color: #555; border-radius: 50%; flex-shrink: 0; transition: background-color 0.3s; }
+        .vm-item.running .vm-status-dot { background-color: #4caf50; box-shadow: 0 0 8px #4caf50; }
+        
+        /* 右側顯示區 */
         .display-area { flex: 1; background-color: #1e1e1e; display: flex; flex-direction: column; position: relative; }
         .tabs-bar { background-color: #2d2d2d; height: 35px; display: flex; border-bottom: 1px solid #3c3c3c; }
-        .tab { display: flex; align-items: center; padding: 0 20px; background-color: #2d2d2d; border-right: 1px solid #252526; font-size: 12px; color: #969696; }
-        .tab.active { background-color: #1e1e1e; color: #fff; border-top: 2px solid #007acc; }
+        .tab { display: flex; align-items: center; padding: 0 20px; background-color: #2d2d2d; border-right: 1px solid #252526; font-size: 12px; color: #969696; font-weight: bold; }
+        .tab.active { background-color: #1e1e1e; color: #fff; border-top: 3px solid #007acc; }
+        
+        /* 螢幕與儀表板 */
         .screen-container { flex: 1; background-color: #111111; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background-color: #111111; display: none; }
-        .vm-details-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 40px; background-color: #1e1e1e; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        .vm-title { font-size: 24px; color: #fff; }
-        .vm-meta { font-size: 13px; color: #aaa; }
-        .hardware-table { width: 100%; max-width: 500px; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
-        .hardware-table td { padding: 8px 0; border-bottom: 1px solid #333; }
-        .hardware-table td.label { color: #858585; width: 150px; }
+        
+        /* 虛擬機詳細資料面板 */
+        .vm-details-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 40px; background-color: #1e1e1e; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; }
+        .vm-title { font-size: 28px; color: #fff; font-weight: 500; }
+        .vm-meta { font-size: 14px; color: #aaa; display: flex; align-items: center; gap: 8px; }
+        .status-tag { padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #333; color: #aaa; }
+        .status-tag.running { background-color: #1b4721; color: #81c784; }
+        
+        .hardware-table { width: 100%; max-width: 550px; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .hardware-table td { padding: 12px 0; border-bottom: 1px solid #2d2d2d; }
+        .hardware-table td.label { color: #858585; width: 180px; }
+        .desc-text { font-size: 13px; color: #777; line-height: 1.6; max-width: 550px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -51,124 +69,155 @@
 
     <div class="main-container">
         <div class="sidebar">
-            <div class="sidebar-header">Windows 家族</div>
+            <div class="sidebar-header">Windows 經典時代</div>
             <ul class="vm-list">
-                <li class="vm-item active" id="item-msdos" onclick="selectVM('msdos', 'MS-DOS 6.22 (1994)', 'msdos', '640 KB', 'Intel 80386', '20 MB')"><div class="vm-status-dot"></div><span>MS-DOS 6.22</span></li>
-                <li class="vm-item" id="item-win101" onclick="selectVM('win101', 'Windows 1.01 (1985)', 'windows101', '1 MB', 'Intel 8086', '10 MB')"><div class="vm-status-dot"></div><span>Windows 1.01</span></li>
-                <li class="vm-item" id="item-win31" onclick="selectVM('win31', 'Windows 3.1 (1992)', 'windows31', '4 MB', 'Intel 80486', '40 MB')"><div class="vm-status-dot"></div><span>Windows 3.1</span></li>
-                <li class="vm-item" id="item-win95" onclick="selectVM('win95', 'Windows 95 OSR2', 'windows95', '64 MB', 'Pentium 133', '2 GB')"><div class="vm-status-dot"></div><span>Windows 95</span></li>
-                <li class="vm-item" id="item-win98" onclick="selectVM('win98', 'Windows 98 SE', 'windows98', '128 MB', 'Pentium II', '4 GB')"><div class="vm-status-dot"></div><span>Windows 98</span></li>
-                <li class="vm-item" id="item-win2k" onclick="selectVM('win2k', 'Windows 2000 Pro', 'windows2000', '256 MB', 'Pentium III', '8 GB')"><div class="vm-status-dot"></div><span>Windows 2000</span></li>
-                <li class="vm-item" id="item-winxp" onclick="selectVM('winxp', 'Windows XP Professional', 'windowsxp', '512 MB', 'Pentium 4', '20 GB')"><div class="vm-status-dot"></div><span>Windows XP</span></li>
-                <li class="vm-item" id="item-win7" onclick="selectVM('win7', 'Windows 7 Professional', 'w7', '2 GB', 'Core 2 Quad', '50 GB')"><div class="vm-status-dot"></div><span>Windows 7</span></li>
-                <li class="vm-item" id="item-win10" onclick="selectVM('win10', 'Windows 10 Pro', 'w10', '4 GB', 'Intel Core i5', '50 GB')"><div class="vm-status-dot"></div><span>Windows 10</span></li>
-                <li class="vm-item" id="item-win11" onclick="selectVM('win11', 'Windows 11 Pro', 'w11', '4 GB', 'Intel Core i7', '64 GB')"><div class="vm-status-dot"></div><span>Windows 11</span></li>
-            </ul>
+                <li class="vm-item active" id="item-msdos" onclick="selectVM('msdos', 'MS-DOS 6.22 (1994)', 'msdos', '640 KB', 'Intel 80386', '20 MB', '微軟經典的命令列作業系統，是現代 Windows 的大基石。')"><div class="vm-status-dot"></div><span>MS-DOS 6.22</span></li>
+                <li class="vm-item" id="item-win101" onclick="selectVM('win101', 'Windows 1.01 (1985)', 'windows101<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VMware Workstation Pro - 40系統神級博物館 v1.2</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
+        body { display: flex; flex-direction: column; height: 100vh; background-color: #1e1e1e; color: #d4d4d4; overflow: hidden; }
+        
+        /* 頂部選單列 */
+        .menu-bar { background-color: #2d2d2d; height: 30px; display: flex; align-items: center; padding: 0 10px; font-size: 12px; border-bottom: 1px solid #3c3c3c; gap: 15px; }
+        .menu-item { cursor: pointer; padding: 2px 5px; color: #aaa; }
+        .menu-item:hover { background-color: #3e3e3e; color: #fff; border-radius: 3px; }
+        
+        /* 工具列 */
+        .toolbar { background-color: #252526; height: 50px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #3c3c3c; gap: 12px; }
+        .btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #333333; border: 1px solid #444444; border-radius: 4px; color: #ccc; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn:hover { background-color: #444444; color: #fff; border-color: #555; }
+        .btn-play .icon { width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid #4caf50; }
+        .btn-stop .icon { width: 10px; height: 10px; background-color: #f44336; }
+        
+        /* 主架構 */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        
+        /* 側邊欄優化 */
+        .sidebar { width: 320px; background-color: #252526; border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-header { padding: 12px 15px; font-size: 11px; font-weight: bold; color: #007acc; text-transform: uppercase; border-bottom: 1px solid #2d2d2d; background-color: #202021; position: sticky; top: 0; z-index: 10; letter-spacing: 1px; }
+        .vm-list { list-style: none; padding: 5px 0; }
+        .vm-item { display: flex; align-items: center; padding: 10px 15px; font-size: 13px; cursor: pointer; gap: 12px; color: #cccccc; border-left: 3px solid transparent; }
+        .vm-item:hover { background-color: #2a2d2e; color: #fff; }
+        .vm-item.active { background-color: #094771; color: #ffffff; border-left-color: #007acc; }
+        .vm-status-dot { width: 8px; height: 8px; background-color: #555; border-radius: 50%; flex-shrink: 0; transition: background-color 0.3s; }
+        .vm-item.running .vm-status-dot { background-color: #4caf50; box-shadow: 0 0 8px #4caf50; }
+        
+        /* 右側顯示區 */
+        .display-area { flex: 1; background-color: #1e1e1e; display: flex; flex-direction: column; position: relative; }
+        .tabs-bar { background-color: #2d2d2d; height: 35px; display: flex; border-bottom: 1px solid #3c3c3c; }
+        .tab { display: flex; align-items: center; padding: 0 20px; background-color: #2d2d2d; border-right: 1px solid #252526; font-size: 12px; color: #969696; font-weight: bold; }
+        .tab.active { background-color: #1e1e1e; color: #fff; border-top: 3px solid #007acc; }
+        
+        /* 螢幕與儀表板 */
+        .screen-container { flex: 1; background-color: #111111; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; background-color: #111111; display: none; }
+        
+        /* 虛擬機詳細資料面板 */
+        .vm-details-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 40px; background-color: #1e1e1e; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; }
+        .vm-title { font-size: 28px; color: #fff; font-weight: 500; }
+        .vm-meta { font-size: 14px; color: #aaa; display: flex; align-items: center; gap: 8px; }
+        .status-tag { padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #333; color: #aaa; }
+        .status-tag.running { background-color: #1b4721; color: #81c784; }
+        
+        .hardware-table { width: 100%; max-width: 550px; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .hardware-table td { padding: 12px 0; border-bottom: 1px solid #2d2d2d; }
+        .hardware-table td.label { color: #858585; width: 180px; }
+        .desc-text { font-size: 13px; color: #777; line-height: 1.6; max-width: 550px; margin-top: 10px; }
+    </style>
+</head>
+<body>
 
-            <div class="sidebar-header">Mac 家族 (歷史軸)</div>
-            <ul class="vm-list">
-                <li class="vm-item" id="item-macsys1" onclick="selectVM('macsys1', 'System 1.0 (1984)', 'mac68k', '128 KB', 'Motorola 68000', '400 KB')"><div class="vm-status-dot"></div><span>System 1 (圖形先河)</span></li>
-                <li class="vm-item" id="item-macsys7" onclick="selectVM('macsys7', 'System 7.5.3 (1991)', 'mac68k', '8 MB', 'Motorola 68040', '50 MB')"><div class="vm-status-dot"></div><span>System 7 (彩色多工)</span></li>
-                <li class="vm-item" id="item-macos8" onclick="selectVM('macos8', 'Mac OS 8.1 (1997)', 'mac8', '32 MB', 'PowerPC 604', '500 MB')"><div class="vm-status-dot"></div><span>Mac OS 8</span></li>
-                <li class="vm-item" id="item-macos9" onclick="selectVM('macos9', 'Mac OS 9.0.4 (1999)', 'mac9', '64 MB', 'PowerPC G3', '1 GB')"><div class="vm-status-dot"></div><span>Mac OS 9</span></li>
-                <li class="vm-item" id="item-osx10" onclick="selectVM('osx10', 'Mac OS X 10.0 Cheetah', 'mac9', '128 MB', 'PowerPC G4', '5 GB')"><div class="vm-status-dot"></div><span>OS X 10.0 Cheetah</span></li>
-                <li class="vm-item" id="item-osx14" onclick="selectVM('osx14', 'Mac OS X 10.4 Tiger', 'mac9', '256 MB', 'PowerPC G5', '10 GB')"><div class="vm-status-dot"></div><span>OS X 10.4 Tiger</span></li>
-                <li class="vm-item" id="item-osx15" onclick="selectVM('osx15', 'Mac OS X 10.5 Leopard', 'mac9', '512 MB', 'Intel Core 2', '15 GB')"><div class="vm-status-dot"></div><span>OS X 10.5 Leopard</span></li>
-                <li class="vm-item" id="item-osx16" onclick="selectVM('osx16', 'Mac OS X 10.6 Snow Leopard', 'mac9', '1 GB', 'Intel Xeon', '20 GB')"><div class="vm-status-dot"></div><span>OS X 10.6 Snow Leopard</span></li>
-                <li class="vm-item" id="item-osx109" onclick="selectVM('osx109', 'OS X 10.9 Mavericks', 'mac9', '2 GB', 'Intel Core i5', '30 GB')"><div class="vm-status-dot"></div><span>OS X 10.9 Mavericks</span></li>
-                <li class="vm-item" id="item-osx1010" onclick="selectVM('osx1010', 'OS X 10.10 Yosemite', 'mac9', '2 GB', 'Intel Core i5', '35 GB')"><div class="vm-status-dot"></div><span>OS X 10.10 Yosemite</span></li>
-                <li class="vm-item" id="item-macos12" onclick="selectVM('macos12', 'macOS 12 Monterey', 'mac9', '4 GB', 'Apple M1', '60 GB')"><div class="vm-status-dot"></div><span>macOS 12 Monterey</span></li>
-                <li class="vm-item" id="item-macos15" onclick="selectVM('macos15', 'macOS 15 Sequoia', 'mac9', '8 GB', 'Apple M4', '100 GB')"><div class="vm-status-dot"></div><span>macOS 15 Sequoia</span></li>
-            </ul>
-
-            <div class="sidebar-header">Linux 家族 (核心線)</div>
-            <ul class="vm-list">
-                <li class="vm-item" id="item-lin001" onclick="selectVM('lin001', 'Linux Kernel 0.01 (1991)', 'linux3', '2 MB', 'Intel 80386 (萬行神話)', '4 MB')"><div class="vm-status-dot"></div><span>Linux 0.01 (初發布)</span></li>
-                <li class="vm-item" id="item-lin100" onclick="selectVM('lin100', 'Linux Kernel 1.0 (1994)', 'linux3', '4 MB', 'Intel 80486 (穩定版)', '20 MB')"><div class="vm-status-dot"></div><span>Linux 1.0 (TCP/IP)</span></li>
-                <li class="vm-item" id="item-lin24" onclick="selectVM('lin24', 'Linux Kernel 2.2/2.4 (1999)', 'linux3', '16 MB', 'Pentium II (伺服器)', '100 MB')"><div class="vm-status-dot"></div><span>Linux 2.2/2.4 (多處理器)</span></li>
-                <li class="vm-item" id="item-lin30" onclick="selectVM('lin30', 'Linux Kernel 3.0 (2011)', 'linux3', '64 MB', 'Intel Xeon (Android)', '1 GB')"><div class="vm-status-dot"></div><span>Linux 3.0 (20週年)</span></li>
-                <li class="vm-item" id="item-lin50" onclick="selectVM('lin50', 'Linux Kernel 4.0/5.0 (2015)', 'alpine', '128 MB', 'Virtual CPU (免重啟)', '2 GB')"><div class="vm-status-dot"></div><span>Linux 4.0/5.0 (Livepatch)</span></li>
-                <li class="vm-item" id="item-lin60" onclick="selectVM('lin60', 'Linux Kernel 6.0 (2022)', 'arch', '512 MB', 'Apple M1 (Rust)', '4 GB')"><div class="vm-status-dot"></div><span>Linux 6.0 (Rust引入)</span></li>
-                <li class="vm-item" id="item-lin71" onclick="selectVM('lin71', 'Linux Kernel 7.0/7.1 (2026)', 'arch', '2 GB', 'AI Cluster (最新)', '10 GB')"><div class="vm-status-dot"></div><span>Linux 7.0/7.1 (AI安全模組)</span></li>
-            </ul>
-        </div>
-
-        <div class="display-area">
-            <div class="tabs-bar"><div class="tab active" id="current-tab">MS-DOS 6.22</div></div>
-            <div class="screen-container">
-                <iframe id="vm-screen" src=""></iframe>
-                <div class="vm-details-panel" id="details-panel">
-                    <h1 class="vm-title" id="panel-title">MS-DOS 6.22 (1994)</h1>
-                    <p class="vm-meta">狀態: <span id="panel-status" style="color: #f44336;">已關機</span></p>
-                    <table class="hardware-table">
-                        <tr><td class="label">虛擬記憶體</td><td id="panel-ram">640 KB</td></tr>
-                        <tr><td class="label">模擬處理器</td><td id="panel-cpu">Intel 80386</td></tr>
-                        <tr><td class="label">虛擬硬碟</td><td id="panel-disk">20 MB</td></tr>
-                        <tr><td class="label">網路適配器</td><td>NAT (自動對接)</td></tr>
-                    </table>
-                    <p style="margin-top: 20px; font-size: 13px; color: #858585;">點擊上方「啟動此虛擬機」按鈕開始運行時光機。</p>
-                </div>
-            </div>
-        </div>
+    <div class="menu-bar">
+        <div class="menu-item">檔案 (F)</div><div class="menu-item">編輯 (E)</div><div class="menu-item">檢視 (V)</div><div class="menu-item">虛擬機 (M)</div><div class="menu-item">說明 (H)</div>
     </div>
 
-    <script>
-        const baseUrls = {
-            msdos: 'https://copy.sh/v86/?profile=msdos',
-            windows101: 'https://copy.sh/v86/?profile=windows101',
-            windows31: 'https://copy.sh/v86/?profile=windows31',
-            windows95: 'https://copy.sh/v86/?profile=windows95',
-            windows98: 'https://copy.sh/v86/?profile=windows98',
-            windows2000: 'https://copy.sh/v86/?profile=windows2000',
-            windowsxp: 'https://copy.sh/v86/?profile=windowsxp',
-            w7: 'https://win7.blueedge.me',
-            w10: 'https://win10.blueedge.me',
-            w11: 'https://win11.blueedge.me',
-            mac68k: 'https://pce-m68k.vercel.app',
-            mac8: 'https://macos8.app',
-            mac9: 'https://macos9.app',
-            linux3: 'https://copy.sh/v86/?profile=linux3',
-            alpine: 'https://copy.sh/v86/?profile=alpine',
-            arch: 'https://copy.sh/v86/?profile=archlinux'
-        };
+    <div class="toolbar">
+        <button class="btn btn-play" onclick="powerOn()"><div class="icon"></div> 啟動此虛擬機</button>
+        <button class="btn btn-stop" onclick="powerOff()"><div class="icon"></div> 關閉電源</button>
+    </div>
 
-        let currentVM = { id: 'msdos', name: 'MS-DOS 6.22 (1994)', type: 'msdos', isRunning: false };
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="sidebar-header">Windows 經典時代</div>
+            <ul class="vm-list">
+                <li class="vm-item active" id="item-msdos" onclick="selectVM('msdos', 'MS-DOS 6.22 (1994)', 'msdos', '640 KB', 'Intel 80386', '20 MB', '微軟經典的命令列作業系統，是現代 Windows 的大基石。')"><div class="vm-status-dot"></div><span>MS-DOS 6.22</span></li>
+                <li class="vm-item" id="item-win101" onclick="selectVM('win101', 'Windows 1.01 (1985)', 'windows101<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VMware Workstation Pro - 40系統神級博物館 v1.2</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
+        body { display: flex; flex-direction: column; height: 100vh; background-color: #1e1e1e; color: #d4d4d4; overflow: hidden; }
+        
+        /* 頂部選單列 */
+        .menu-bar { background-color: #2d2d2d; height: 30px; display: flex; align-items: center; padding: 0 10px; font-size: 12px; border-bottom: 1px solid #3c3c3c; gap: 15px; }
+        .menu-item { cursor: pointer; padding: 2px 5px; color: #aaa; }
+        .menu-item:hover { background-color: #3e3e3e; color: #fff; border-radius: 3px; }
+        
+        /* 工具列 */
+        .toolbar { background-color: #252526; height: 50px; display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #3c3c3c; gap: 12px; }
+        .btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #333333; border: 1px solid #444444; border-radius: 4px; color: #ccc; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn:hover { background-color: #444444; color: #fff; border-color: #555; }
+        .btn-play .icon { width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid #4caf50; }
+        .btn-stop .icon { width: 10px; height: 10px; background-color: #f44336; }
+        
+        /* 主架構 */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        
+        /* 側邊欄優化 */
+        .sidebar { width: 320px; background-color: #252526; border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; overflow-y: auto; }
+        .sidebar-header { padding: 12px 15px; font-size: 11px; font-weight: bold; color: #007acc; text-transform: uppercase; border-bottom: 1px solid #2d2d2d; background-color: #202021; position: sticky; top: 0; z-index: 10; letter-spacing: 1px; }
+        .vm-list { list-style: none; padding: 5px 0; }
+        .vm-item { display: flex; align-items: center; padding: 10px 15px; font-size: 13px; cursor: pointer; gap: 12px; color: #cccccc; border-left: 3px solid transparent; }
+        .vm-item:hover { background-color: #2a2d2e; color: #fff; }
+        .vm-item.active { background-color: #094771; color: #ffffff; border-left-color: #007acc; }
+        .vm-status-dot { width: 8px; height: 8px; background-color: #555; border-radius: 50%; flex-shrink: 0; transition: background-color 0.3s; }
+        .vm-item.running .vm-status-dot { background-color: #4caf50; box-shadow: 0 0 8px #4caf50; }
+        
+        /* 右側顯示區 */
+        .display-area { flex: 1; background-color: #1e1e1e; display: flex; flex-direction: column; position: relative; }
+        .tabs-bar { background-color: #2d2d2d; height: 35px; display: flex; border-bottom: 1px solid #3c3c3c; }
+        .tab { display: flex; align-items: center; padding: 0 20px; background-color: #2d2d2d; border-right: 1px solid #252526; font-size: 12px; color: #969696; font-weight: bold; }
+        .tab.active { background-color: #1e1e1e; color: #fff; border-top: 3px solid #007acc; }
+        
+        /* 螢幕與儀表板 */
+        .screen-container { flex: 1; background-color: #111111; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; background-color: #111111; display: none; }
+        
+        /* 虛擬機詳細資料面板 */
+        .vm-details-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 40px; background-color: #1e1e1e; display: flex; flex-direction: column; gap: 25px; overflow-y: auto; }
+        .vm-title { font-size: 28px; color: #fff; font-weight: 500; }
+        .vm-meta { font-size: 14px; color: #aaa; display: flex; align-items: center; gap: 8px; }
+        .status-tag { padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; background-color: #333; color: #aaa; }
+        .status-tag.running { background-color: #1b4721; color: #81c784; }
+        
+        .hardware-table { width: 100%; max-width: 550px; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .hardware-table td { padding: 12px 0; border-bottom: 1px solid #2d2d2d; }
+        .hardware-table td.label { color: #858585; width: 180px; }
+        .desc-text { font-size: 13px; color: #777; line-height: 1.6; max-width: 550px; margin-top: 10px; }
+    </style>
+</head>
+<body>
 
-        function selectVM(id, fullName, type, ram, cpu, disk) {
-            powerOff();
-            document.querySelectorAll('.vm-item').forEach(item => item.classList.remove('active'));
-            document.getElementById('item-' + id).classList.add('active');
-            currentVM = { id: id, name: fullName, type: type, isRunning: false };
-            document.getElementById('current-tab').innerText = fullName.split(' (')[0];
-            document.getElementById('panel-title').innerText = fullName;
-            document.getElementById('panel-ram').innerText = ram;
-            document.getElementById('panel-cpu').innerText = cpu;
-            document.getElementById('panel-disk').innerText = disk;
-            document.getElementById('panel-status').innerText = "已關機";
-            document.getElementById('panel-status').style.color = "#f44336";
-        }
+    <div class="menu-bar">
+        <div class="menu-item">檔案 (F)</div><div class="menu-item">編輯 (E)</div><div class="menu-item">檢視 (V)</div><div class="menu-item">虛擬機 (M)</div><div class="menu-item">說明 (H)</div>
+    </div>
 
-        function powerOn() {
-            currentVM.isRunning = true;
-            document.getElementById('item-' + currentVM.id).classList.add('running');
-            document.getElementById('details-panel').style.display = 'none';
-            const screen = document.getElementById('vm-screen');
-            screen.style.display = 'block';
-            screen.src = baseUrls[currentVM.type];
-        }
+    <div class="toolbar">
+        <button class="btn btn-play" onclick="powerOn()"><div class="icon"></div> 啟動此虛擬機</button>
+        <button class="btn btn-stop" onclick="powerOff()"><div class="icon"></div> 關閉電源</button>
+    </div>
 
-        function powerOff() {
-            currentVM.isRunning = false;
-            if(document.getElementById('item-' + currentVM.id)) {
-                document.getElementById('item-' + currentVM.id).classList.remove('running');
-            }
-            document.getElementById('details-panel').style.display = 'flex';
-            const screen = document.getElementById('vm-screen');
-            screen.style.display = 'none';
-            screen.src = "";
-            document.getElementById('panel-status').innerText = "已關機";
-            document.getElementById('panel-status').style.color = "#f44336";
-        }
-    </script>
-</body>
-</html>
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="sidebar-header">Windows 經典時代</div>
+            <ul class="vm-list">
+                <li class="vm-item active" id="item-msdos" onclick="selectVM('msdos', 'MS-DOS 6.22 (1994)', 'msdos', '640 KB', 'Intel 80386', '20 MB', '微軟經典的命令列作業系統，是現代 Windows 的大基石。')"><div class="vm-status-dot"></div><span>MS-DOS 6.22</span></li>
+                <li class="vm-item" id="item-win101" onclick="selectVM('win101', 'Windows 1.01 (1985)', 'windows101
